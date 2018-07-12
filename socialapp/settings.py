@@ -25,7 +25,7 @@ SECRET_KEY = 'ma-*g+k0$rl2t6h3mxurh%hm*+7z^dx)2jus+n8z(1(s=gl!i3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['social-app-gaga2017.c9users.io']
 
 
 # Application definition
@@ -120,3 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+
+# AUTH_USER_MODEL = 'app.Profile'
