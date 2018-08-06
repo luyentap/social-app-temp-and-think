@@ -1,20 +1,31 @@
 #luu vao file word cac buoc chi chi
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers  import make_password
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    #profile
+        
+    birthday = models.DateField()
+    address = models.CharField(max_length=100)
+    
+    
     @property
     def full_name(self):
         "Returns the user's full name."
         return '%s %s' % (self.user.first_name, self.user.last_name)
-        
-    birthday = models.DateField()
-    address = models.CharField(max_length=100)
-
+    
+    #save user have encrypted password
+    def save(self, *args, **kwargs):
+        user = User.objects.get(username=self.user.username)
+        user.set_password(user.password);
+        user.save()
+    
+        super(Profile, self).save(*args, **kwargs)
+    
     def __str__(self):
         return str(self.full_name)
+
 
 class Friend(models.Model):
     """

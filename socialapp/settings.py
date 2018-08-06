@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
+    'tastypie',
     
 ]
 
@@ -124,3 +125,8 @@ STATIC_URL = '/static/'
 
 
 # AUTH_USER_MODEL = 'app.Profile'
+
+#api --> create password
+# PASSWORD_HASHERS = [
+#      'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+# ]
