@@ -10,11 +10,11 @@ from tastypie.exceptions import Unauthorized
 import tastypie
 from django.contrib.auth.hashers import make_password
 from django.db import IntegrityError
-from account_resources import ProfileResource
+from account_resources import UserResource
 
 
 class PostResource(ModelResource):
-    author = tastypie.fields.ForeignKey(ProfileResource, 'author', full=True)
+    author = tastypie.fields.ForeignKey(UserResource, 'author', full=True)
     class Meta:
         resource_name = 'post'
         queryset = Post.objects.all()
@@ -24,6 +24,6 @@ class PostResource(ModelResource):
     def authorized_read_list(self, object_list, bundle):
         # print(dir(bundle.request.user))
         # print(bundle.request.user.id)
-        profile = Profile.objects.filter(user=bundle.request.user.id)
-        return object_list.filter(author=profile).select_related()
+        # profile = Profile.objects.filter(user=bundle.request.user.id)
+        return object_list.filter(author=bundle.request.user.id).select_related()
         

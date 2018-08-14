@@ -21,7 +21,10 @@ api_key= models.signals.post_save.connect(create_api_key, sender=User)
 class UserResource(ModelResource):
     class Meta:
         queryset = User.objects.all()
+        #must authorization : create profile(user+ detail)
+        authorization = Authorization()
         excludes = ["password"]
+        allowed_methods = ["post","put"]
     
     
 #create profie( = user + other information of user) 
@@ -47,8 +50,9 @@ class CreateUserResource(ModelResource):
     
     class Meta:
         queryset = Profile.objects.all()
-        resource_name = 'account'
+        resource_name = 'account/create'
         allowed_methods =["post"]
+        
         authorization = Authorization() 
         #return json  when create user
         always_return_data = True   
@@ -59,9 +63,10 @@ class ProfileResource(ModelResource):
     user = tastypie.fields.ForeignKey(UserResource, 'user', full=True)
     class Meta:
         queryset = Profile.objects.all()
-        resource_name = 'profile'
+        resource_name = 'profile/see'
         allowed_methods =["get"]
         authentication = ApiKeyAuthentication()
+        
     
     #return json hava address : upper ~~
     def dehydrate_address(self, bundle):
@@ -74,8 +79,19 @@ class UpdateProfileResource(ModelResource):
     class Meta:
         queryset = Profile.objects.all()
         resource_name = 'profile/update'
-        allowed_methods =["get"]
+        allowed_methods =["put","get"]
         excludes = ['username']
+        authentication = ApiKeyAuthentication()
+        authorization = Authorization()
+        always_return_data = True 
+        
+    def authorized_read_list(self, object_list, bundle):
+        return object_list.filter(id=bundle.request.user.id).select_related()
+        
+    
+    # def get_list(self, request, **kwargs):
+    #     kwargs["pk"] = request.user.profile.pk
+    #     return super(UpdateProfileResource, self).get_detail(request, **kwargs)
         
 
 
