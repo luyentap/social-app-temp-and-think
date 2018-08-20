@@ -13,10 +13,8 @@ from django.db import IntegrityError
 
 # class CustomPassWordAuthorization(Authorization):
 
-
-#auto create api_key when create user
+#auto create api_key when create user or login,..
 api_key= models.signals.post_save.connect(create_api_key, sender=User)
-
 
 class UserResource(ModelResource):
     class Meta:
@@ -24,76 +22,39 @@ class UserResource(ModelResource):
         #must authorization : create profile(user+ detail)
         authorization = Authorization()
         excludes = ["password"]
-        allowed_methods = ["post","put"]
+        allowed_methods = ["get","post","put"]
     
     
 #create profie( = user + other information of user) 
 class CreateUserResource(ModelResource):
-    """
-            1. register accout(User)
-                exmaple:
-              {
-                	"user":{
-                	"username":"nguyenthia2223",
-                	"password":"111111aA@",
-                	"first_name":"nguyen thi",
-                	"last_name":"A",
-                	"email":"nguyenthia@gmail.com"
-                	},
-                	
-                	"birthday":"1994-09-01",
-                	"address":"dn"
-                }
-               }
-    """
     user = tastypie.fields.ForeignKey(UserResource, 'user', full=True)
     
     class Meta:
         queryset = Profile.objects.all()
-        resource_name = 'account/create'
+        resource_name = 'account'
         allowed_methods =["post"]
-        
         authorization = Authorization() 
         #return json  when create user
         always_return_data = True   
     
    
-#see profile of users    
+#see profile of users  and update profile
 class ProfileResource(ModelResource):
     user = tastypie.fields.ForeignKey(UserResource, 'user', full=True)
     class Meta:
         queryset = Profile.objects.all()
-        resource_name = 'profile/see'
-        allowed_methods =["get"]
-        authentication = ApiKeyAuthentication()
-        
-    
-    #return json hava address : upper ~~
-    def dehydrate_address(self, bundle):
-        return bundle.data['address'].upper()
-    
-
-# update profile
-class UpdateProfileResource(ModelResource):
-    user = tastypie.fields.ForeignKey(UserResource, 'user', full=True)
-    class Meta:
-        queryset = Profile.objects.all()
-        resource_name = 'profile/update'
-        allowed_methods =["put","get"]
-        excludes = ['username']
+        resource_name = 'profile'
+        allowed_methods =["get","put"]
         authentication = ApiKeyAuthentication()
         authorization = Authorization()
         always_return_data = True 
-        
+    
     def authorized_read_list(self, object_list, bundle):
         return object_list.filter(id=bundle.request.user.id).select_related()
-        
     
     # def get_list(self, request, **kwargs):
     #     kwargs["pk"] = request.user.profile.pk
     #     return super(UpdateProfileResource, self).get_detail(request, **kwargs)
-        
-
 
 
 #login return data of user and api_key(use for other request after login)
@@ -101,9 +62,11 @@ class LoginResource(ModelResource):
     class Meta:
         queryset = User.objects.all()
         resource_name = 'login'
-        allowed_methods = ['get']
+        allowed_methods = ['get',"delete"]
         excludes = [ 'password']
         authentication = BasicAuthentication()
+        authorization = Authorization()
+        
     
     #return data of user and api_key
     def dehydrate(self, bundle):
@@ -121,14 +84,30 @@ class LoginResource(ModelResource):
     # def authorized_read_list(self, object_list, bundle):
     #     return object_list.filter(id=bundle.request.user.id).select_related()
     
-
-
     
+    # def logout(self, request, **kwargs):
+    #     """
+    #     A new end point to logout the user using the django login system
+    #     """
+    #     self.method_check(request, allowed=['delete'])
+    #     if request.user and request.user.is_authenticated():
+    #         logout(request)
 
-        
-        
-    
 
-    
-        
-        
+#logout
+class LogoutResource(ModelResource):
+    class Meta:
+        queryset = User.objects.all()
+        resource_name = 'logout'
+        allow_method = ["delete"]
+        authentication = BasicAuthentication()
+        authorization = Authorization()
+        always_return_data = True 
+
+    def logout(self, request, **kwargs):
+        """
+        A new end point to logout the user using the django login system
+        """
+        self.method_check(request, allowed=['delete'])
+        if request.user and request.user.is_authenticated():
+            self.logout(request)

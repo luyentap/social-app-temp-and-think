@@ -20,18 +20,24 @@ from api.post_resources import *
 from tastypie.api import Api
 
 #define api and register resources
+#user and profile
 v1_api = Api(api_name='v1')
 v1_api.register(UserResource())
 v1_api.register(CreateUserResource())
 v1_api.register(ProfileResource())
-v1_api.register(UpdateProfileResource())
 v1_api.register(LoginResource())
-v1_api.register(PostResource())
+v1_api.register(LogoutResource())
 
+#api : post
+v1_api.register(PostByUserResource())
+v1_api.register(PostsResource())
 
+v1_api.register(CommentInPostResource())
+v1_api.register(CommentsResource())
 
 #define patterns of url
 urlpatterns = [
+    # url("^api/ ^(?P<api_name>v1)/$ [name='api_v1_top_level']",none),
     url(r'^admin/', admin.site.urls),
     url('/app/',include('app.urls')),
     url(r'^api/', include(v1_api.urls)),

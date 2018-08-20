@@ -65,7 +65,7 @@ class Post(models.Model):
     count_comment = models.IntegerField(default=0)
     
     def __str__(self):
-        return str(self.author)
+        return '%s . %s' %(str(self.id),self.content)
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
