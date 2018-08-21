@@ -17,6 +17,9 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from api.account_resources import *
 from api.post_resources import *
+from  api.friend_resources import *
+from api.like_resources import *
+from api.comment_resources import *
 from tastypie.api import Api
 
 #define api and register resources
@@ -26,14 +29,23 @@ v1_api.register(UserResource())
 v1_api.register(CreateUserResource())
 v1_api.register(ProfileResource())
 v1_api.register(LoginResource())
-v1_api.register(LogoutResource())
 
-#api : post
+#register api : post
 v1_api.register(PostByUserResource())
-v1_api.register(PostsResource())
+v1_api.register(AllPostsResource())
+v1_api.register(ListPostByUserResource())
 
+#register api : friend
+v1_api.register(FriendRequestResource())
+
+#register api: like post
+v1_api.register(LikePostResource())
+v1_api.register(AllLikeInPostResource())
+
+#register api: comment post
 v1_api.register(CommentInPostResource())
-v1_api.register(CommentsResource())
+v1_api.register(AllCommentInPostResource())
+
 
 #define patterns of url
 urlpatterns = [

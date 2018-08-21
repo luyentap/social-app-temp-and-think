@@ -23,6 +23,7 @@ class UserResource(ModelResource):
         authorization = Authorization()
         excludes = ["password"]
         allowed_methods = ["get","post","put"]
+        authentication = Authentication()
     
     
 #create profie( = user + other information of user) 
@@ -52,7 +53,6 @@ class ProfileResource(ModelResource):
     def authorized_read_list(self, object_list, bundle):
         return object_list.filter(id=bundle.request.user.id).select_related()
     
-    # def get_list(self, request, **kwargs):
     #     kwargs["pk"] = request.user.profile.pk
     #     return super(UpdateProfileResource, self).get_detail(request, **kwargs)
 
@@ -62,10 +62,9 @@ class LoginResource(ModelResource):
     class Meta:
         queryset = User.objects.all()
         resource_name = 'login'
-        allowed_methods = ['get',"delete"]
+        allowed_methods = ['get',"delete","post"]
         excludes = [ 'password']
         authentication = BasicAuthentication()
-        authorization = Authorization()
         
     
     #return data of user and api_key
@@ -77,37 +76,19 @@ class LoginResource(ModelResource):
     
     ## Since there is only one user profile object, call get_detail instead
     def get_list(self, request, **kwargs):
-        kwargs["pk"] = request.user.profile.pk
+        print(request.user.profile)
+        kwargs["pk"] = request.user.id
         return super(LoginResource, self).get_detail(request, **kwargs)
     
-    #or
-    # def authorized_read_list(self, object_list, bundle):
-    #     return object_list.filter(id=bundle.request.user.id).select_related()
+   
     
-    
-    # def logout(self, request, **kwargs):
-    #     """
-    #     A new end point to logout the user using the django login system
-    #     """
-    #     self.method_check(request, allowed=['delete'])
-    #     if request.user and request.user.is_authenticated():
-    #         logout(request)
-
-
-#logout
-class LogoutResource(ModelResource):
-    class Meta:
-        queryset = User.objects.all()
-        resource_name = 'logout'
-        allow_method = ["delete"]
-        authentication = BasicAuthentication()
-        authorization = Authorization()
-        always_return_data = True 
-
     def logout(self, request, **kwargs):
         """
         A new end point to logout the user using the django login system
         """
         self.method_check(request, allowed=['delete'])
         if request.user and request.user.is_authenticated():
-            self.logout(request)
+            super(LoginResource,self).logout(request)
+
+
+
