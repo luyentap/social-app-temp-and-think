@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.accounts.apps.AccountsConfig',
     'apps.posts.apps.PostsConfig',
     'apps',
+    'tastypie'
 ]
 
 MIDDLEWARE = [
